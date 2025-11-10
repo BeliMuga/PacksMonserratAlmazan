@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="/images/favicon.png"
+    />
+    <title>Escoge tus Lotes</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        font-family: Segoe UI, Tahoma, Geneva,
+          Verdana, sans-serif, system-ui;
+      }
+
+      html,
+      body {
+        min-height: 100vh; /* at least one viewport tall */
+        margin: 0; /* remove default margin */
+      }
+
+      body {
+        background-image: url("images/imgBckGnd3.svg");
+        background-repeat: repeat-x; /* repeat only left→right */
+        background-size: 50% auto; /* each copy takes ½ screen width → 2 copies visible */
+        background-position: top left;
+        background-attachment: fixed;
+        background-color: #070540;
+      }
+
+      :root {
+        --accent: #e60909;
+        --grey: #f5f5f5;
+        --radius: 12px;
+        --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        --transition: 0.25s ease-in-out;
+      }
+
+      .logo {
+        height: 50vh;
+        padding-bottom: 1.5em;
+      }
+
+      .bundle-intro {
+        display: flex;
+        flex-direction: column;
+        text-align: center; /* centers text */
+        width: 70vw; /* keeps text readable */
+        margin: 2rem auto; /* vertical spacing + horizontal centering */
+        font-weight: normal; /* ensures no bold */
+        color: var(--grey); /* nice dark gray */
+        line-height: 1.6; /* comfortable line spacing */
+      }
+
+      .bundle-intro h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        font-weight: normal;
+      }
+
+      .bundle-intro h3 {
+        font-size: 1.1rem;
+        font-weight: normal;
+      }
+      #buttonTr {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.4rem 1.2rem;
+        font-weight: 600;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: background 0.25s ease-in-out;
+        align-self: flex-end;
+      }
+
+      p {
+        display: inline;
+        background-color: var(--grey);
+        color: var(--accent);
+        padding: 0.2em 0.4em;
+        border-radius: 0.4em;
+      }
+
+      /* ----------  grid  ---------- */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8rem;
+        max-width: 1200px;
+        margin: auto;
+        justify-content: center;
+      }
+
+      @media (max-width: 900px) {
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ----------  card  ---------- */
+      .json-card {
+        background: #fff;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        transition: transform var(--transition),
+          box-shadow var(--transition);
+        overflow: hidden;
+      }
+      .json-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px
+          rgba(0, 0, 0, 0.12);
+      }
+
+      .json-card.featured {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        grid-column: span 2; /* spans both columns */
+        width: 80vw;
+        min-height: 700px; /* adjust height as needed */
+        gap: 2rem; /* space between image + content */
+        padding: 3em;
+      }
+
+      .json-card.featured .bundle-img {
+        width: 50%;
+      }
+
+      .json-card.featured .title {
+        align-self: flex-start; /* stick to the top of the flex line */
+      }
+
+      .json-card.featured .description {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .badge-strip {
+        grid-column: span 2;
+        color: var(--grey);
+        font-size: 2em;
+        text-align: center;
+      }
+
+      /* ----------  content  ---------- */
+      .title {
+        font-size: 1.6rem;
+        text-align: center;
+        font-weight: normal;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+      }
+
+      .unit {
+        font-size: 0.875rem;
+        color: #666;
+        margin-bottom: 1rem;
+      }
+
+      .lines {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        font-size: 0.9em;
+      }
+
+      .prod {
+        font-weight: 500;
+      }
+
+      .total {
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .foot {
+        font-size: 0.875rem;
+        color: #666;
+      }
+      .total-bar {
+        position: sticky;
+        bottom: 0;
+        background: #fff;
+        margin-top: 1em;
+        border-top: 1px solid #ddd;
+        padding: 1rem;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .line {
+        display: grid;
+        grid-template-columns: 5fr 1fr 2fr 2fr;
+        align-items: center;
+        padding: 0.25rem 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .lines-header {
+        display: grid;
+        grid-template-columns: 5fr 1fr 2fr 2fr;
+        font-size: 0.85rem;
+        color: #888;
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+        text-align: center;
+      }
+
+      .price,
+      .totals,
+      .qty {
+        text-align: center;
+      }
+      .cart-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.5rem;
+      }
+
+      .qty-ctrl {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .qty-ctrl button {
+        background: #f8f8f8;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        padding: 0.2rem 0.6rem;
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      .qty-ctrl button:hover {
+        background: #eee;
+      }
+
+      button {
+        padding: 0.3rem 0.6rem;
+        cursor: pointer;
+      }
+
+      .cart-row .foot {
+        min-width: 80px;
+        text-align: left;
+      }
+
+      .cart-row .qty-ctrl {
+        min-width: 80px;
+      }
+
+      .cart-row .total {
+        min-width: 80px;
+        text-align: right;
+      }
+
+      .add {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.4rem 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.25s ease-in-out;
+      }
+
+      #show-cart {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.4rem 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.25s ease-in-out;
+      }
+
+      .add:hover {
+        background: #e63b3b;
+      }
+
+      .json-card .bundle-img {
+        width: 100%;
+        height: auto; /* keeps aspect ratio */
+        display: block; /* removes inline spacing below image */
+        margin: 0;
+        padding: 0;
+      }
+
+      /* ----------  empty-state  ---------- */
+      .json-card.empty {
+        opacity: 0.45;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="bundle-intro">
+      <button id="buttonTr">ES</button>
+      <div class="logo">
+        <img
+          class="logo"
+          src="images/logo.png"
+          alt="logo"
+        />
+      </div>
+      <h1 class="tr" data-key="main_title">
+        Volem celebrar aquest nadal amb tu!
+      </h1>
+      <h2 class="tr" data-key="sub_title">
+        Hem disenyat els següents packs perquè els
+        podeu gaudir
+      </h2>
+    </div>
+
+    <div class="grid"></div>
+    <footer class="total-bar">
+      <button id="show-cart" type="button">
+        <span class="tr" data-key="show_btn"
+          >MOSTRAR</span
+        >
+      </button>
+      <h3>
+        <span class="tr" data-key="total_label"
+          >Total Productes:</span
+        >
+        <span id="grand-total">0 €</span>
+      </h3>
+    </footer>
+    <script>
+      /* ----------  logic (30 lines)  ---------- */
+      const data = {
+        PackNocheBuena: {
+          product1: {
+            name: "Pernil iberic de gla",
+            precio: "416 €",
+            unidad: "1",
+            total: "416 €",
+          },
+          product2: {
+            name: "Pernil iberic",
+            precio: "272 €",
+            unidad: "1",
+            total: "272 €",
+          },
+          product3: {
+            name: "Espatlla iberica cebo peça",
+            precio: "139 €",
+            unidad: "1",
+            total: "139",
+          },
+          product4: {
+            name: "Fuet peça",
+            precio: "198 €",
+            unidad: "1",
+            total: "198 €",
+          },
+          product5: {
+            name: "Llonganisa peça",
+            precio: "2.41 €",
+            unidad: "1",
+            total: "2.41 €",
+          },
+          product6: {
+            name: "Cuña queso cabra",
+            precio: "7 €",
+            unidad: "1",
+            total: "7 €",
+          },
+          product7: {
+            name: "Cuña queso oveja ",
+            precio: "7 €",
+            unidad: "1",
+            total: "7 €",
+          },
+          product8: {
+            name: "Kimchi 300g",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product9: {
+            name: "Xucrut 300g",
+            precio: "4 €",
+            unidad: "1",
+            total: "4 €",
+          },
+          product10: {
+            name: "Llonganisa llescat 100g",
+            precio: "4 €",
+            unidad: "1",
+            total: "4 €",
+          },
+          product11: {
+            name: "Xoriç llescat 100g",
+            precio: "3 €",
+            unidad: "1",
+            total: "3 €",
+          },
+          product12: {
+            name: "Salchichon llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product13: {
+            name: "Llom iberic llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product14: {
+            name: "Cap de llom llescat 100g",
+            precio: "4.69 €",
+            unidad: "1",
+            total: "4.69 €",
+          },
+          product15: {
+            name: "Jamon serrano llescat 100g",
+            precio: "2.62 €",
+            unidad: "1",
+            total: "2.62 €",
+          },
+          product16: {
+            name: "Paleta iberica llescat 100g",
+            precio: "2.34 €",
+            unidad: "1",
+            total: "2.34 €",
+          },
+          product17: {
+            name: "Encenalls de pernil ibèric 100g",
+            precio: "5.20 €",
+            unidad: "1",
+            total: "5.20 €",
+          },
+          product18: {
+            name: "Espatlla iberica de gla llescat 100g",
+            precio: "2.85 €",
+            unidad: "1",
+            total: "2.85 €",
+          },
+          product19: {
+            name: "Llonganisa llescat 100g",
+            precio: "8 €",
+            unidad: "1",
+            total: "8 €",
+          },
+          product20: {
+            name: "Fuet llescat 100g",
+            precio: "3€",
+            unidad: "1",
+            total: "3 €",
+          },
+          product21: {
+            name: "Vi negre",
+            precio: "3 €",
+            unidad: "1",
+            total: "3 €",
+          },
+          product22: {
+            name: "Vi negre gama alta",
+            precio: "0 €",
+            unidad: "1",
+            total: "0 €",
+          },
+          product23: {
+            name: "Vi blanc",
+            precio: "0 €",
+            unidad: "1",
+            total: "0 €",
+          },
+          product24: {
+            name: "Vi blanc gama alta",
+            precio: "0 €",
+            unidad: "1",
+            total: "0 €",
+          },
+          product25: {
+            name: "Cava",
+            precio: "0 €",
+            unidad: "1",
+            total: "0 €",
+          },
+          product26: {
+            name: "Champang",
+            precio: "0 €",
+            unidad: "1",
+            total: "0 €",
+          },
+          product27: {
+            name: "Oli ",
+            precio: "0 €",
+            unidad: "1",
+            total: "0 €",
+          },
+          product28: {
+            name: "Caixa de cartró",
+            precio: "4 €",
+            unidad: "1",
+            total: "4 €",
+          },
+          subTotal: 40.0,
+        },
+        PackBelén: {
+          product1: {
+            name: "Pernil iberic de gla",
+            precio: "532 €",
+            unidad: "1",
+            total: "532 €",
+          },
+          product2: {
+            name: "Pernil iberic peça",
+            precio: "284 €",
+            unidad: "1",
+            total: "284 €",
+          },
+          product3: {
+            name: "Espatlla iberica cebo peça",
+            precio: "77 €",
+            unidad: "1",
+            total: "77 €",
+          },
+          product4: {
+            name: "Espatlla iberica de gla peça",
+            precio: "223 €",
+            unidad: "1",
+            total: "223 €",
+          },
+          product5: {
+            name: "Fuet peça",
+            precio: "3 €",
+            unidad: "1",
+            total: "3 €",
+          },
+          product6: {
+            name: "Llonganisa peça",
+            precio: "3.53 €",
+            unidad: "1",
+            total: "3.53 €",
+          },
+          product7: {
+            name: "Cuña queso cabra",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product8: {
+            name: "Cuña queso oveja",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product9: {
+            name: "Kimchi 300g",
+            precio: "7 €",
+            unidad: "1",
+            total: "7 €",
+          },
+          product10: {
+            name: "Xucrut 300g",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product11: {
+            name: "Llonganisa llescada 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product12: {
+            name: "Xoriç llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product13: {
+            name: "Salchichon llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product14: {
+            name: "Llom iberic llescat 100g",
+            precio: "5 €",
+            unidad: "1",
+            total: "5 €",
+          },
+          product15: {
+            name: "Espatlla iberica llescat 100g",
+            precio: "6.20 €",
+            unidad: "1",
+            total: "6.20 €",
+          },
+          product16: {
+            name: "Pernil llescat 100g",
+            precio: "2.20 €",
+            unidad: "1",
+            total: "2.20 €",
+          },
+          product17: {
+            name: "Encenalls de pernil ibèric 100g",
+            precio: "3.50 €",
+            unidad: "1",
+            total: "3.50 €",
+          },
+          product18: {
+            name: "Paleta iberica bellota llescada 100g",
+            precio: "8.70 €",
+            unidad: "1",
+            total: "8.70 €",
+          },
+          product19: {
+            name: "Fuet llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product20: {
+            name: "Vi negre Idrias crianza 2021 6 meses roble frances",
+            precio: "10 €",
+            unidad: "1",
+            total: "10 €",
+          },
+          product21: {
+            name: "Vi negre mirapallars merlot 14 mesos criança roure",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product22: {
+            name: "Vi blanc artesia garnatxa blanca",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product23: {
+            name: "Cava bohigas reserva bnature 18 mesos",
+            precio: "18 €",
+            unidad: "1",
+            total: "18 €",
+          },
+          product24: {
+            name: "Oli cuadrat valley bio 500ml",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product25: {
+            name: "Caixa de cartró",
+            precio: "4 €",
+            unidad: "1",
+            total: "4 €",
+          },
+          subTotal: 155.0,
+        },
+        PackCagaTió: {
+          product1: {
+            name: "Pernil iberic de gla",
+            precio: "532 €",
+            unidad: "1",
+            total: "532 €",
+          },
+          product2: {
+            name: "Pernil iberic peça",
+            precio: "284 €",
+            unidad: "1",
+            total: "284 €",
+          },
+          product3: {
+            name: "Espatlla iberica cebo peça",
+            precio: "77 €",
+            unidad: "1",
+            total: "77 €",
+          },
+          product4: {
+            name: "Espatlla iberica de gla peça",
+            precio: "223 €",
+            unidad: "1",
+            total: "223 €",
+          },
+          product5: {
+            name: "Fuet peça",
+            precio: "3 €",
+            unidad: "1",
+            total: "3 €",
+          },
+          product6: {
+            name: "Llonganisa peça",
+            precio: "3.53 €",
+            unidad: "1",
+            total: "3.53 €",
+          },
+          product7: {
+            name: "Cuña queso cabra",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product8: {
+            name: "Cuña queso oveja",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product9: {
+            name: "Kimchi 300g",
+            precio: "7 €",
+            unidad: "1",
+            total: "7 €",
+          },
+          product10: {
+            name: "Xucrut 300g",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product11: {
+            name: "Llonganisa llescada 100g",
+            precio: "2 €",
+            unidad: "2",
+            total: "4 €",
+          },
+          product12: {
+            name: "Xoriç llescat 100g",
+            precio: "2 €",
+            unidad: "2",
+            total: "4 €",
+          },
+          product13: {
+            name: "Salchichon llescat 100g",
+            precio: "2 €",
+            unidad: "2",
+            total: "4 €",
+          },
+          product14: {
+            name: "Llom iberic llescat 100g",
+            precio: "10 €",
+            unidad: "2",
+            total: "10 €",
+          },
+          product15: {
+            name: "Espatlla iberica llescat 100g",
+            precio: "6.20 €",
+            unidad: "2",
+            total: "12.40 €",
+          },
+          product16: {
+            name: "Pernil llescat 100g",
+            precio: "2.20 €",
+            unidad: "1",
+            total: "2.20 €",
+          },
+          product17: {
+            name: "Encenalls de pernil ibèric 100g",
+            precio: "3.50 €",
+            unidad: "1",
+            total: "3.50 €",
+          },
+          product18: {
+            name: "Paleta iberica bellota llescada 100g",
+            precio: "8.70 €",
+            unidad: "1",
+            total: "8.70 €",
+          },
+          product19: {
+            name: "Fuet llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product20: {
+            name: "Vi negre Idrias crianza 2021 6 meses roble frances",
+            precio: "10 €",
+            unidad: "1",
+            total: "10 €",
+          },
+          product21: {
+            name: "Vi negre mirapallars merlot 14 mesos criaza roure",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product22: {
+            name: "Vi blanc artesia garnatxa blanca",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product23: {
+            name: "Cava bohigas reserva bnature 18 mesos",
+            precio: "18 €",
+            unidad: "1",
+            total: "18 €",
+          },
+          product24: {
+            name: "Oli cuadrat valley bio 500ml",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product25: {
+            name: "Caixa de cartró",
+            precio: "4 €",
+            unidad: "1",
+            total: "4 €",
+          },
+          subTotal: 98.0,
+        },
+        PackReisMags: {
+          product1: {
+            name: "Pernil iberic de gla",
+            precio: "532 €",
+            unidad: "1",
+            total: "532 €",
+          },
+          product2: {
+            name: "Pernil iberic peça",
+            precio: "284 €",
+            unidad: "1",
+            total: "284 €",
+          },
+          product3: {
+            name: "Espatlla iberica cebo peça",
+            precio: "77 €",
+            unidad: "1",
+            total: "77 €",
+          },
+          product4: {
+            name: "Espatlla iberica de gla peça",
+            precio: "223 €",
+            unidad: "1",
+            total: "223 €",
+          },
+          product5: {
+            name: "Fuet peça",
+            precio: "3 €",
+            unidad: "1",
+            total: "3 €",
+          },
+          product6: {
+            name: "Llonganisa peça",
+            precio: "3.53 €",
+            unidad: "1",
+            total: "3.53 €",
+          },
+          product7: {
+            name: "Cuña queso cabra",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product8: {
+            name: "Cuña queso oveja",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product9: {
+            name: "Kimchi 300g",
+            precio: "7 €",
+            unidad: "1",
+            total: "7 €",
+          },
+          product10: {
+            name: "Xucrut 300g",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product11: {
+            name: "Llonganisa llescada 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product12: {
+            name: "Xoriç llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product13: {
+            name: "Salchichon llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product14: {
+            name: "Llom iberic llescat 100g",
+            precio: "5 €",
+            unidad: "1",
+            total: "5 €",
+          },
+          product15: {
+            name: "Espatlla iberica llescat 100g",
+            precio: "6.20 €",
+            unidad: "1",
+            total: "6.20 €",
+          },
+          product16: {
+            name: "Pernil llescat 100g",
+            precio: "2.20 €",
+            unidad: "1",
+            total: "2.20 €",
+          },
+          product17: {
+            name: "Encenalls de pernil ibèric 100g",
+            precio: "3.50 €",
+            unidad: "1",
+            total: "3.50 €",
+          },
+          product18: {
+            name: "Paleta iberica bellota llescada 100g",
+            precio: "8.70 €",
+            unidad: "1",
+            total: "8.70 €",
+          },
+          product19: {
+            name: "Fuet llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product20: {
+            name: "Vi negre Idrias crianza 2021 6 meses roble frances",
+            precio: "10 €",
+            unidad: "1",
+            total: "10 €",
+          },
+          product21: {
+            name: "Vi negre mirapallars merlot 14 mesos criaza roure",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product22: {
+            name: "Vi blanc artesia garnatxa blanca",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product23: {
+            name: "Cava bohigas reserva bnature 18 mesos",
+            precio: "18 €",
+            unidad: "1",
+            total: "18 €",
+          },
+          product24: {
+            name: "Oli cuadrat valley bio 500ml",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product25: {
+            name: "Caixa de cartró",
+            precio: "4 €",
+            unidad: "1",
+            total: "4 €",
+          },
+          subTotal: 91.0,
+        },
+
+        Pack360: {
+          product1: {
+            name: "Pernil iberic de gla",
+            precio: "532 €",
+            unidad: "1",
+            total: "532 €",
+          },
+          product2: {
+            name: "Pernil iberic peça",
+            precio: "284 €",
+            unidad: "1",
+            total: "284 €",
+          },
+          product3: {
+            name: "Espatlla iberica cebo peça",
+            precio: "77 €",
+            unidad: "1",
+            total: "77 €",
+          },
+          product4: {
+            name: "Espatlla iberica de gla peça",
+            precio: "223 €",
+            unidad: "1",
+            total: "223 €",
+          },
+          product5: {
+            name: "Fuet peça",
+            precio: "3 €",
+            unidad: "1",
+            total: "3 €",
+          },
+          product6: {
+            name: "Llonganisa peça",
+            precio: "3.53 €",
+            unidad: "1",
+            total: "3.53 €",
+          },
+          product7: {
+            name: "Cuña queso cabra",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product8: {
+            name: "Cuña queso oveja",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product9: {
+            name: "Kimchi 300g",
+            precio: "7 €",
+            unidad: "1",
+            total: "7 €",
+          },
+          product10: {
+            name: "Xucrut 300g",
+            precio: "6 €",
+            unidad: "1",
+            total: "6 €",
+          },
+          product11: {
+            name: "Llonganisa llescada 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product12: {
+            name: "Xoriç llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product13: {
+            name: "Salchichon llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product14: {
+            name: "Llom iberic llescat 100g",
+            precio: "5 €",
+            unidad: "1",
+            total: "5 €",
+          },
+          product15: {
+            name: "Espatlla iberica llescat 100g",
+            precio: "6.20 €",
+            unidad: "10",
+            total: "6.20 €",
+          },
+          product16: {
+            name: "Pernil llescat 100g",
+            precio: "2.20 €",
+            unidad: "1",
+            total: "2.20 €",
+          },
+          product17: {
+            name: "Encenalls de pernil ibèric 100g",
+            precio: "3.50 €",
+            unidad: "1",
+            total: "3.50 €",
+          },
+          product18: {
+            name: "Paleta iberica bellota llescada 100g",
+            precio: "8.70 €",
+            unidad: "1",
+            total: "8.70 €",
+          },
+          product19: {
+            name: "Fuet llescat 100g",
+            precio: "2 €",
+            unidad: "1",
+            total: "2 €",
+          },
+          product20: {
+            name: "Vi negre Idrias crianza 2021 6 meses roble frances",
+            precio: "10 €",
+            unidad: "1",
+            total: "10 €",
+          },
+          product21: {
+            name: "Vi negre mirapallars merlot 14 mesos criaza roure",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product22: {
+            name: "Vi blanc artesia garnatxa blanca",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product23: {
+            name: "Cava bohigas reserva bnature 18 mesos",
+            precio: "18 €",
+            unidad: "1",
+            total: "18 €",
+          },
+          product24: {
+            name: "Oli cuadrat valley bio 500ml",
+            precio: "15 €",
+            unidad: "1",
+            total: "15 €",
+          },
+          product25: {
+            name: "Caixa de cartró",
+            precio: "4 €",
+            unidad: "1",
+            total: "4 €",
+          },
+          subTotal: 76.0,
+        },
+      };
+
+      const dict = {
+        ca: {
+          // original Catalan
+          main_title:
+            "Volem celebrar aquest nadal amb tu!",
+          sub_title:
+            "Hem dissenyat els següents packs perquè els podeu gaudir",
+          show_btn: "MOSTRAR",
+          badge_1: "Tenim packs HALAL a mida",
+          badge_2:
+            "Repartim a tots els direccions que puguis tenir",
+          total_label: "Total Productes",
+          invoice_hdr: "FACTURA TEMPORAL:\n\n",
+          invoice_line: (b, q, t) =>
+            `${b} → Quantitat: ${q} Total: €${t.toFixed(
+              2
+            )}\n`,
+          total_footer: "\nTotal Reimpressió: €",
+          reprint_note:
+            "\n\nAquesta és una reimpresió temporal; imprimeix la pantalla per guardar-la.",
+        },
+        es: {
+          // Spanish
+          main_title:
+            "¡Queremos celebrar estas Navidades contigo!",
+          sub_title:
+            "Hemos diseñado los siguientes packs para que puedas disfrutarlos",
+          show_btn: "MUESTRA",
+          badge_1: "Tenemos packs HALAL a medida",
+          badge_2:
+            "Repartimos a todas las direcciones que puedas tener",
+          total_label: "Total Productos",
+          invoice_hdr: "FACTURA TEMPORAL:\n\n",
+          invoice_line: (b, q, t) =>
+            `${b} → Cantidad: ${q} Total: €${t.toFixed(
+              2
+            )}\n`,
+          total_footer: "\nTotal Reimpresión: €",
+          reprint_note:
+            "\n\nEsta es una reimpresión temporal; imprime la pantalla para guardarla.",
+        },
+      };
+
+      let currentLang = "ca";
+
+      function translatePage(lang = "ca") {
+        document
+          .querySelectorAll(".tr")
+          .forEach((el) => {
+            const key = el.dataset.key;
+            el.textContent = dict[lang][key];
+          });
+      }
+
+      document
+        .getElementById("buttonTr")
+        .addEventListener("click", (e) => {
+          currentLang =
+            currentLang === "ca" ? "es" : "ca";
+          translatePage(currentLang);
+          e.target.textContent =
+            currentLang === "ca" ? "ES" : "CAT";
+        });
+
+      const cardsHTML = Object.entries(data)
+        .map(([bundleName, bundle]) => {
+          const lines = Object.entries(bundle)
+            .filter(([k]) =>
+              k.startsWith("product")
+            )
+            .map(
+              ([key, p]) => `
+                  <div class="line">
+                    <span class="prod">${p.name}</span>
+                    <span class="qty">${p.unidad}</span>
+                    <span class="price">${p.precio}</span>
+                    <span class="totals">${p.total}</span>
+                  </div>`
+            )
+            .join("");
+          const imgSrc = `https://raw.githubusercontent.com/BeliMuga/PacksMonserratAlmazan/main/images/${bundleName}.jpg`;
+          const bundleTitle = bundleName.replace(
+            /([a-z])([A-Z])/g,
+            "$1 $2"
+          );
+          const isFeatured =
+            bundleName === "PackNocheBuena";
+
+          return `
+             <article class="json-card${
+               isFeatured ? " featured" : ""
+             }">
+                <h2 class="title">${bundleTitle}</h2>
+                <img class="bundle-img" src="${imgSrc}" alt="${bundleName}">
+                <div class="description">
+
+                <div class="lines-header"> <span></span><span>Qty</span><span>Price</span><span>Total</span> </div>
+                <div class="lines">${lines}</div>
+                <div class="cart-row" data-key="${bundleName}" data-subtotal="${
+            bundle.subTotal
+          }">
+                  <div class="foot">${
+                    Object.keys(bundle).filter(
+                      (k) =>
+                        k.startsWith("product")
+                    ).length
+                  } products</div>
+
+                  <div class="qty-ctrl">
+                    <button class="dec">-</button>
+                    <span class="qty">0</span>
+                    <button class="inc">+</button>
+                  </div>
+
+                  <span class="total">${
+                    bundle.subTotal
+                  } €</span>
+
+                </div>
+                </div>
+
+
+              </article>
+              ${
+                isFeatured
+                  ? `
+      <div class="badge-strip">
+        <p class="tr" data-key="badge_1">Tenim packs HALAL a mida</p>
+        <br>
+        <br>
+        <p class="tr" data-key="badge_2">Repartim a tots els direccions que puguis tenir</p>
+      </div>`
+                  : ""
+              }
+              `;
+        })
+        .join("");
+
+      document.addEventListener(
+        "DOMContentLoaded",
+        () => {
+          const grid =
+            document.querySelector(".grid");
+          grid.innerHTML = cardsHTML;
+
+          // Attach event listeners via event delegation
+          grid.addEventListener("click", (e) => {
+            if (e.target.matches(".inc, .dec")) {
+              const row =
+                e.target.closest(".cart-row");
+              const qtyEl =
+                row.querySelector(".qty");
+              const totalEl =
+                row.querySelector(".total");
+              const subTotal = parseFloat(
+                row.dataset.subtotal
+              );
+
+              let qty = parseInt(
+                qtyEl.textContent
+              );
+              if (
+                e.target.classList.contains("inc")
+              )
+                qty++;
+              else if (qty > 0) {
+                qty--;
+              }
+
+              // Update qty display
+              qtyEl.textContent = qty;
+
+              // Update total only if qty > 0
+              const newTotal = subTotal * qty;
+              totalEl.dataset.value = newTotal; // always store the number
+
+              // choose what the human sees
+              totalEl.textContent =
+                qty > 0
+                  ? newTotal.toFixed(2) + " €"
+                  : "0 €";
+
+              recalcGrand();
+            }
+          });
+        }
+      );
+
+      function recalcGrand() {
+        let grand = 0;
+
+        document
+          .querySelectorAll(".cart-row .total")
+          .forEach((el) => {
+            grand += parseFloat(
+              el.dataset.value || 0
+            );
+          });
+
+        // update the on-screen total
+        document.getElementById(
+          "grand-total"
+        ).textContent = grand.toFixed(2) + " €";
+      }
+
+      // 👇 only show alert when pressing the button
+      document
+        .getElementById("show-cart")
+        .addEventListener("click", () => {
+          translatePage(currentLang); // if you use this for static text
+          let grand = 0;
+          let summary =
+            dict[currentLang].invoice_hdr; // start translated invoice
+
+          document
+            .querySelectorAll(".cart-row")
+            .forEach((row) => {
+              const bundle = row.dataset.key;
+              const qty = parseInt(
+                row.querySelector(".qty")
+                  .textContent
+              );
+              const total = parseFloat(
+                row.querySelector(".total")
+                  .dataset.value || 0
+              );
+
+              if (qty > 0) {
+                grand += total;
+                // use your translation template
+                summary += dict[
+                  currentLang
+                ].invoice_line(
+                  bundle,
+                  qty,
+                  total
+                );
+              }
+            });
+
+          summary +=
+            dict[currentLang].total_footer +
+            grand.toFixed(2) +
+            dict[currentLang].reprint_note;
+
+          alert(summary);
+          location.reload();
+        });
+    </script>
+  </body>
+</html>
